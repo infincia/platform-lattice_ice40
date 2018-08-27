@@ -10,9 +10,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/platformio/platform-lattice_ice40.git"
+    "url": "https://github.com/infincia/platform-lattice_ice40.git"
   },
-  "version": "1.2.1",
+  "version": "1.2.1-9999",
   "packageRepositories": [
     "https://dl.bintray.com/platformio/dl-packages/manifest.json",
     "http://dl.platformio.org/packages/manifest.json"
