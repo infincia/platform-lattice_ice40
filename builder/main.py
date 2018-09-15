@@ -22,17 +22,64 @@
 import os
 from os.path import join
 from platform import system
+import re
+import subprocess
+import sys
+
+if sys.platform == 'darwin':
+    try:
+        import plistlib
+    except:
+        pass
 
 from SCons.Script import (COMMAND_LINE_TARGETS, AlwaysBuild, Builder, Default,
                           DefaultEnvironment, Environment, Exit, GetOption,
                           Glob)
 
 env = DefaultEnvironment()
+BUILD_CORE = env.BoardConfig().get('build.core', 'icestick')
+
+if BUILD_CORE == "blackiceii":
+    
+    print("Looking for blackice ii programmer port")
+    programmer_port = None
+
+    if sys.platform == "darwin":
+        resp = subprocess.check_output(["/usr/sbin/ioreg", "-k", "kUSBSerialNumberString", "-r", "-l", "-a"])
+
+        if resp:
+            plist_out = plistlib.readPlistFromString(resp)
+            for device in plist_out:
+                # these are the octal versions of the pid:vid pair for the blackice ii, 
+                # are they actually unique?
+                if device["idProduct"] == 22336 and device["idVendor"] == 1155:
+                    device_str = str(device)
+                    port_regex = re.compile(r"'IOCalloutDevice': '(?P<programmer_port>/dev/cu.usbmodem\d+)'")
+                    result = port_regex.search(device_str)
+                    if result:
+                        groups = result.groupdict()
+                        if groups:
+                            programmer_port = groups.get("programmer_port")
+                            if programmer_port:
+                                break
+
+
+    if programmer_port:
+        print("Found programmer port: " + programmer_port)
+
+    uploader = "/bin/cat"
+    uploader_flags = [">", programmer_port]
+    upload_bin_command='$UPLOADER $SOURCES $UPLOADERFLAGS'
+else:    
+    uploader = "iceprog"
+    uploader_flags = []
+    upload_bin_command='$UPLOADER $UPLOADERFLAGS $SOURCES'
+
 env.Replace(
     PROGNAME='hardware',
-    UPLOADER='iceprog',
-    UPLOADERFLAGS=[],
-    UPLOADBINCMD='$UPLOADER $UPLOADERFLAGS $SOURCES')
+    UPLOADER=uploader,
+    UPLOADERFLAGS=uploader_flags,
+    UPLOADBINCMD=upload_bin_command)
 env.Append(SIMULNAME='simulation')
 
 # -- Target name for synthesis
