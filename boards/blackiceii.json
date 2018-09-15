@@ -1,0 +1,27 @@
+{
+  "build": {
+    "core": "blackiceii",
+    "cpu": "fpga",
+    "f_cpu": "12000000L",
+    "hwids": [
+      [
+        "0x0483",
+        "0x5740"
+      ]
+    ],
+    "mcu": "iCE40-HX4K-TQ144",
+    "pack": "tq144:4k",
+    "size": "8k",
+    "type": "hx"
+  },
+  "frameworks": [
+    "icestorm"
+  ],
+  "name": "myStorm Blackice II FPGA",
+  "upload": {
+    "maximum_ram_size": 15000,
+    "maximum_size": 138240
+  },
+  "url": "https://github.com/mystorm-org/BlackIce-II/wiki",
+  "vendor": "myStorm"
+}
